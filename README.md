@@ -6,7 +6,7 @@ This is a SvelteKit project that embeds a Flutter web app.
 
 - [Node.js](https://nodejs.org/en/) (v14 or higher)
 - [npm](https://www.npmjs.com/) (v6 or higher)
-- [Flutter](https://flutter.dev/docs/get-started/install) (v3.10 or higher)
+- [Flutter 3.10](https://flutter.dev/docs/get-started/install) (v3.10 or higher)
 
 ## Running & Building
 
