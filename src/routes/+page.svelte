@@ -37,7 +37,10 @@
 <style>
   .flutter_target {
     width: 300px;
-    height: 400px;
+    height: 450px;
+    background-color: #f2f2f2;
+    border: 1px solid #000;
+    margin-left: 20px;
     margin-top: 20px;
   }
 </style>
