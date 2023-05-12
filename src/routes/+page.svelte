@@ -1,46 +1,59 @@
 <script>
-  import { onMount } from "svelte";
-  /**
-   * @type any
-   */
-  let target;
-  onMount(() => {
-    if (window._flutter) {
-      window._flutter.loader.loadEntrypoint({
-        entrypointUrl: "/flutter/main.dart.js",
-        onEntrypointLoaded: async (engineInitializer) => {
-          let appRunner = await engineInitializer.initializeEngine({
-            hostElement: target,
-            assetBase: "/flutter/",
-          });
-          await appRunner.runApp();
-        },
-      });
+  import FlutterApp from "./flutterApp.svelte";
+  /** @type any */
+  let flutterState;
+  let count;
+  let text;
+  const onFlutterAppLoaded = (event ) => {
+    console.log(event.detail);
+    flutterState = event.detail;
+    count = flutterState.getClicks();
+    flutterState.onClicksChanged(() => { onCounterChanged() });
+    flutterState.onTextChanged(() => { onTextChanged() });
+  }
 
-      target.addEventListener("flutter-initialized", (event) => {
-        console.log(event);
-      });
-    }
-  });
+  const onCounterSet = (event) => {
+    let clicks = parseInt((event.target).value, 10) || 0;
+    flutterState.setClicks(clicks);
+  }
+
+  const onTextSet = (event) => {
+    flutterState.setText((event.target).value || '');
+  }
+
+  // I need to force a change detection here. When clicking on the "Decrement"
+  // button, everything works fine, but clicking on Flutter doesn't trigger a
+  // repaint (even though this method is called)
+  const onCounterChanged = () => {
+    count = flutterState.getClicks();
+  }
+
+  const onTextChanged = () => {
+    text = flutterState.getText();
+  }
+
+  let screen = 'counter';
+  const screenChanged = (event ) => {
+    flutterState.setScreen(screen);
+  }
 </script>
 
-<svelte:head>
-  <script src="/flutter/flutter.js"></script>
-</svelte:head>
+
 <h1>Welcome to SvelteKit</h1>
 <p>
   Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation
 </p>
+<select name="Screen" id="screen" bind:value={screen} on:change={screenChanged}>
+  <option value="counter">counter</option>
+  <option value="text">TextField</option>
+  <option value="dash">Custom App</option>
+</select>
 
-<div class="flutter_target" bind:this={target} />
+{#if screen === 'counter'}
+<p>{count}</p>
+{:else}
+<input type="text" bind:value={text} on:keyup={() => flutterState.setText(text)} on:change={() => flutterState.setText(text)} />
+{/if}
 
-<style>
-  .flutter_target {
-    width: 300px;
-    height: 450px;
-    background-color: #f2f2f2;
-    border: 1px solid #000;
-    margin-left: 20px;
-    margin-top: 20px;
-  }
-</style>
+
+<FlutterApp onFlutterAppLoaded={onFlutterAppLoaded} />
